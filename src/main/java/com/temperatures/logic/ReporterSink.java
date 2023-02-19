@@ -57,7 +57,7 @@ public class ReporterSink extends RichSinkFunction<Result> implements Serializab
 
 		// Begin invoke logic
 
-		//System.out.println(value.toString());
+		System.out.println(value.toString());
 
 		// End invoke logic
 		

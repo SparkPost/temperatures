@@ -78,14 +78,14 @@ public class FileReaderSource extends RichParallelSourceFunction<LineOfText> imp
 				// Read a line from the file and emit it using an instance of LineOfText
 				String line = buffer.readLine();
 				if(line == null) {
-					try {Thread.sleep(1000);} catch(Exception ex ) {;}
+					try {Thread.sleep(1000);
+						running = false;} catch(Exception ex ) {;}
 				} else {
 					if (!line.contains("Region")) {
-//						System.out.println(line);
+						System.out.println(line);
 						context.collect(new LineOfText(line));
 					}
 				}
-
 			}
 		}
 		// End run logic

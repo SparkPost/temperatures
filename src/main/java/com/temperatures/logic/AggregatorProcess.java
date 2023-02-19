@@ -87,7 +87,7 @@ public class AggregatorProcess extends KeyedProcessFunction<ParsedRecordsKey, Pa
 		AggregatorProcessKeyState item = state.value();
 
 		if (item == null) {
-			Long timer = context.timerService().currentProcessingTime() + 10*1000l;
+			Long timer = context.timerService().currentProcessingTime() + 10*10l;
 			context.timerService().registerProcessingTimeTimer(timer);
 			item = new AggregatorProcessKeyState();
 			item.setTimer(timer);
@@ -105,10 +105,13 @@ public class AggregatorProcess extends KeyedProcessFunction<ParsedRecordsKey, Pa
 	@Override
 	public void onTimer(long timestamp, KeyedProcessFunction<ParsedRecordsKey, ParsedRecord, Result>.OnTimerContext ctx, Collector<Result> out) throws Exception {
 		super.onTimer(timestamp, ctx, out);
+		System.out.println("OnTimer");
 		AggregatorProcessKeyState item = state.value();
 		out.collect(new Result(item.getCount(), item.getAvgTemp()/ item.getCount(), item.getKey()));
 		//delete the timer
 		item.setTimer(null);
+		Long timer = ctx.timerService().currentProcessingTime() + 10*10l;
+		ctx.timerService().registerProcessingTimeTimer(timer);
 	}
 
 

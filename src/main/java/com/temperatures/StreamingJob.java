@@ -39,6 +39,7 @@ public class StreamingJob {
 	public static void main(String[] args) {
 
 		LOG.info("Beginning StreamingJob");
+		System.out.println("Beginning StreamingJob");
 
 		try {
 			ParameterTool parameter = null;

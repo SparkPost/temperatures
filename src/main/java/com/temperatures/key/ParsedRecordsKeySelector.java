@@ -2,7 +2,7 @@ package com.temperatures.key;
 
 // Begin imports
 
-import com.temperatures.Helper;
+import com.temperatures.helper.Helper;
 import org.apache.flink.api.java.functions.KeySelector;
 
 import com.temperatures.cargo.ParsedRecord;
