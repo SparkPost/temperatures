@@ -2,7 +2,7 @@ package com.temperatures.logic;
 
 // Begin imports
 
-import com.temperatures.Helper;
+import com.temperatures.helper.Helper;
 import org.apache.flink.api.common.state.ListState;
 import org.apache.flink.api.common.state.ListStateDescriptor;
 import org.apache.flink.api.common.state.ValueState;
