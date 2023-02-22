@@ -105,13 +105,13 @@ public class StreamingJob {
                     new org.apache.flink.core.fs.Path(filePath));
 
             //Create a Datastream based on the directory
-            DataStream<String> operator_strStreamToRecordParser
+            DataStream<String> operator_strStreamToLineOfTextParse
                         = see.readFile(auditFormat,
                             filePath,    //Director to monitor
                             FileProcessingMode.PROCESS_CONTINUOUSLY,
                             1000); //monitor interval
 
-			SingleOutputStreamOperator<LineOfText> operator_LineOfTextStream= operator_strStreamToRecordParser.process(new LineOfTextParserProcess());
+			SingleOutputStreamOperator<LineOfText> operator_LineOfTextStream= operator_strStreamToLineOfTextParse.process(new LineOfTextParserProcess());
 			operator_LineOfTextStream.uid("LineOfTextStream");
 			operator_LineOfTextStream.name("LineOfTextStream");
 
