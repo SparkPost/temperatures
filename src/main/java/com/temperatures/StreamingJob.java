@@ -105,27 +105,28 @@ public class StreamingJob {
                     new org.apache.flink.core.fs.Path(filePath));
 
             //Create a Datastream based on the directory
-            DataStream<String> operator_strStreamToLineOfTextParse
+            DataStream<String> streamFilesAsString
                         = see.readFile(auditFormat,
                             filePath,    //Director to monitor
                             FileProcessingMode.PROCESS_CONTINUOUSLY,
                             1000); //monitor interval
 
-			SingleOutputStreamOperator<LineOfText> operator_LineOfTextStream= operator_strStreamToLineOfTextParse.process(new LineOfTextParserProcess());
+			SingleOutputStreamOperator<LineOfText> operator_LineOfTextStream= streamFilesAsString.process(new LineOfTextParserProcess());
 			operator_LineOfTextStream.uid("LineOfTextStream");
 			operator_LineOfTextStream.name("LineOfTextStream");
 
+			DataStream<LineOfText> streamLineOfTextToParser = operator_LineOfTextStream;
 			// Parser process
- 			SingleOutputStreamOperator<ParsedRecord> operator_ParserParseRecordStream = operator_LineOfTextStream.process(new ParserProcess());
+ 			SingleOutputStreamOperator<ParsedRecord> operator_ParserParseRecordStream = streamLineOfTextToParser.process(new ParserProcess());
 
 			operator_ParserParseRecordStream.uid("Parser");
 			operator_ParserParseRecordStream.name("Parser");
 			operator_ParserParseRecordStream.setParallelism(parameter.getInt("Parser.parallelism", 1));
 
-
+			DataStream<ParsedRecord> streamToAggregator = operator_ParserParseRecordStream;
 			// Aggregator process
-			KeyedStream<ParsedRecord, ParsedRecordsKey> streamToAggregator = operator_ParserParseRecordStream.keyBy(new ParsedRecordsKeySelector());
-     		SingleOutputStreamOperator<Result> operator_Aggregator = streamToAggregator.process(new AggregatorProcess()); 
+			KeyedStream<ParsedRecord, ParsedRecordsKey> keyedAggregator = streamToAggregator.keyBy(new ParsedRecordsKeySelector());
+     		SingleOutputStreamOperator<Result> operator_Aggregator = keyedAggregator.process(new AggregatorProcess());
 
 
 			operator_Aggregator.uid("Aggregator");
@@ -133,10 +134,9 @@ public class StreamingJob {
 			operator_Aggregator.setParallelism(parameter.getInt("Aggregator.parallelism", 1));
 
 
-
 			// Reporter sink
-			
-			DataStreamSink<Result> sink_Reporter = operator_Aggregator.addSink(new ReporterSink()); 
+			DataStream<Result> streamToReporter = operator_Aggregator;
+			DataStreamSink<Result> sink_Reporter = streamToReporter.addSink(new ReporterSink());
 			sink_Reporter.uid("Reporter");
 			sink_Reporter.name("Reporter");
 			sink_Reporter.setParallelism(parameter.getInt("Reporter.parallelism", 1));
