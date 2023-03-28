@@ -111,22 +111,22 @@ public class StreamingJob {
                             FileProcessingMode.PROCESS_CONTINUOUSLY,
                             1000); //monitor interval
 
-			SingleOutputStreamOperator<LineOfText> operator_LineOfTextStream= streamFilesAsString.process(new LineOfTextParserProcess());
-			operator_LineOfTextStream.uid("LineOfTextStream");
-			operator_LineOfTextStream.name("LineOfTextStream");
+			SingleOutputStreamOperator<LineOfText> operator_LineOfTextParser= streamFilesAsString.process(new LineOfTextParserProcess());
+			operator_LineOfTextParser.uid("LineOfTextStream");
+			operator_LineOfTextParser.name("LineOfTextStream");
 
-			DataStream<LineOfText> streamLineOfTextToParser = operator_LineOfTextStream;
+			DataStream<LineOfText> streamToParser = operator_LineOfTextParser;
 			// Parser process
- 			SingleOutputStreamOperator<ParsedRecord> operator_ParserParseRecordStream = streamLineOfTextToParser.process(new ParserProcess());
+ 			SingleOutputStreamOperator<ParsedRecord> operator_Parser = streamToParser.process(new ParserProcess());
 
-			operator_ParserParseRecordStream.uid("Parser");
-			operator_ParserParseRecordStream.name("Parser");
-			operator_ParserParseRecordStream.setParallelism(parameter.getInt("Parser.parallelism", 1));
+			operator_Parser.uid("Parser");
+			operator_Parser.name("Parser");
+			operator_Parser.setParallelism(parameter.getInt("Parser.parallelism", 1));
 
-			DataStream<ParsedRecord> streamToAggregator = operator_ParserParseRecordStream;
+			DataStream<ParsedRecord> streamToAggregator = operator_Parser;
 			// Aggregator process
-			KeyedStream<ParsedRecord, ParsedRecordsKey> keyedAggregator = streamToAggregator.keyBy(new ParsedRecordsKeySelector());
-     		SingleOutputStreamOperator<Result> operator_Aggregator = keyedAggregator.process(new AggregatorProcess());
+			KeyedStream<ParsedRecord, ParsedRecordsKey> keyedStreamToAggregator = streamToAggregator.keyBy(new ParsedRecordsKeySelector());
+     		SingleOutputStreamOperator<Result> operator_Aggregator = keyedStreamToAggregator.process(new AggregatorProcess());
 
 
 			operator_Aggregator.uid("Aggregator");
