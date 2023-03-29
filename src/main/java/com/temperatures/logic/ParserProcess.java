@@ -40,8 +40,8 @@ public class ParserProcess extends ProcessFunction<LineOfText, ParsedRecord>  {
 		super.open(config);
 		processRate = getRuntimeContext().getMetricGroup()
 				.addGroup("kinesisanalytics")
-				.addGroup("Program", "Temperature")
-				.meter("rate", new MeterView(60));
+				.addGroup("Temperature", "ParseRecord")
+				.meter("record-parse-rate", new MeterView(60));
 		
 		ParameterTool parameters = (ParameterTool) getRuntimeContext().getExecutionConfig().getGlobalJobParameters();
 		

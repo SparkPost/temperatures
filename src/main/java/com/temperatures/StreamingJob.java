@@ -88,12 +88,10 @@ public class StreamingJob {
 			conf.setInteger(org.apache.flink.configuration.RestOptions.PORT, 8082);
 			int defaultLocalParallelism = Runtime.getRuntime().availableProcessors();
 			conf.setString("taskmanager.memory.network.max", "1gb");
-			conf.setString("metrics.reporters", "jmx");
-			conf.setString("metrics.reporter.jmx.class", "rg.apache.flink.metrics.jmx.JMXReporter");
-			conf.setInteger("metrics.reporter.jmx.port", 8961);
-			conf.setString("metrics.delimiter", ".");
-			conf.setString("env.java.opts",
-					"-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=localhost");
+			// default port 9249, make sure Prometheus docker image is running, metrics-reporter/prometheus/run.sh
+			// https://nightlies.apache.org/flink/flink-docs-release-1.13/docs/deployment/metric_reporters/#prometheus
+			conf.setString("metrics.reporter.prom.factory.class", "org.apache.flink.metrics.prometheus.PrometheusReporterFactory");
+
 
 			StreamExecutionEnvironment see = StreamExecutionEnvironment.createLocalEnvironment(defaultLocalParallelism, conf);
 
