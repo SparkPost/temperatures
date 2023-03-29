@@ -80,9 +80,23 @@ public class StreamingJob {
 //				String value = String.valueOf(parameter.get(key));
 //				LOG.error("parm: "+key+" ---> "+value);
 //			}
-			
-			StreamExecutionEnvironment see = StreamExecutionEnvironment.getExecutionEnvironment();
-			see.setMaxParallelism(parameter.getInt("maxParallelism", 1000));
+
+//			StreamExecutionEnvironment see = StreamExecutionEnvironment.getExecutionEnvironment();
+//			see.setMaxParallelism(parameter.getInt("maxParallelism", 1000));
+			// https://jedong.medium.com/flink-jvm-metrics-with-jmx-adb805f1003a
+			org.apache.flink.configuration.Configuration conf = new org.apache.flink.configuration.Configuration();
+			conf.setInteger(org.apache.flink.configuration.RestOptions.PORT, 8082);
+			int defaultLocalParallelism = Runtime.getRuntime().availableProcessors();
+			conf.setString("taskmanager.memory.network.max", "1gb");
+			conf.setString("metrics.reporters", "jmx");
+			conf.setString("metrics.reporter.jmx.class", "rg.apache.flink.metrics.jmx.JMXReporter");
+			conf.setInteger("metrics.reporter.jmx.port", 8961);
+			conf.setString("metrics.delimiter", ".");
+			conf.setString("env.java.opts",
+					"-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=localhost");
+
+			StreamExecutionEnvironment see = StreamExecutionEnvironment.createLocalEnvironment(defaultLocalParallelism, conf);
+
 			see.disableOperatorChaining();
 			
 			if (parameter.getBoolean("checkpoint.enabled", false)) {

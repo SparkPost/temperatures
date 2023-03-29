@@ -5,6 +5,8 @@ package com.temperatures.logic;
 import com.temperatures.helper.Helper;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.metrics.Meter;
+import org.apache.flink.metrics.MeterView;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.util.Collector;
 
@@ -20,7 +22,7 @@ import org.slf4j.LoggerFactory;
 public class ParserProcess extends ProcessFunction<LineOfText, ParsedRecord>  {
 
 // Begin declarations
-
+	private transient Meter processRate;
 	private static final Logger LOG = LoggerFactory.getLogger(ParserProcess.class);
 
 	private static final long serialVersionUID = 1L;
@@ -36,6 +38,10 @@ public class ParserProcess extends ProcessFunction<LineOfText, ParsedRecord>  {
 		// Begin open logic
 
 		super.open(config);
+		processRate = getRuntimeContext().getMetricGroup()
+				.addGroup("kinesisanalytics")
+				.addGroup("Program", "Temperature")
+				.meter("rate", new MeterView(60));
 		
 		ParameterTool parameters = (ParameterTool) getRuntimeContext().getExecutionConfig().getGlobalJobParameters();
 		
@@ -60,6 +66,7 @@ public class ParserProcess extends ProcessFunction<LineOfText, ParsedRecord>  {
 		ParsedRecord parsedRecord = Helper.parseRecord(value);
 		System.out.println(this.getClass().getName() + " : " + parsedRecord);
 		collector.collect(parsedRecord);
+		processRate.markEvent();
 		// End process logic
 		
 	}
