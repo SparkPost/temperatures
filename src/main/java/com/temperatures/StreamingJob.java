@@ -135,10 +135,9 @@ public class StreamingJob {
 			operator_Parser.name("Parser");
 			operator_Parser.setParallelism(parameter.getInt("Parser.parallelism", 1));
 
-			DataStream<ParsedRecord> streamToAggregator = operator_Parser;
 			// Aggregator process
-			KeyedStream<ParsedRecord, ParsedRecordsKey> keyedStreamToAggregator = streamToAggregator.keyBy(new ParsedRecordsKeySelector());
-     		SingleOutputStreamOperator<Result> operator_Aggregator = keyedStreamToAggregator.process(new AggregatorProcess());
+			KeyedStream<ParsedRecord, ParsedRecordsKey> streamToAggregator = operator_Parser.keyBy(new ParsedRecordsKeySelector());
+     		SingleOutputStreamOperator<Result> operator_Aggregator = streamToAggregator.process(new AggregatorProcess());
 
 
 			operator_Aggregator.uid("Aggregator");
