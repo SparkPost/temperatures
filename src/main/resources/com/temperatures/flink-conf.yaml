@@ -259,3 +259,4 @@ jobmanager.execution.failover-strategy: region
 # Interval in milliseconds for refreshing the monitored directories.
 #historyserver.archive.fs.refresh-interval: 10000
 
+queryable-state.enable: true

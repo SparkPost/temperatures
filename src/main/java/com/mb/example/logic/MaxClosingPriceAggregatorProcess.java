@@ -31,6 +31,7 @@ public  class MaxClosingPriceAggregatorProcess extends
                 new ValueStateDescriptor<MaxClosingPriceAggregatorProcessKeyState>(
                         "MaxClosingPriceAggregatorProcessKeyState",
                         TypeInformation.of(MaxClosingPriceAggregatorProcessKeyState.class));
+        stateDescriptor.setQueryable("query-name");
         state = getRuntimeContext().getState(stateDescriptor);
     }
     @Override

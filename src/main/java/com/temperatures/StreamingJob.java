@@ -99,7 +99,7 @@ public class StreamingJob {
 
 			// FileReader source
 			//String filePath =	"/Users/praghavan/development/ApacheFlink/project/my-flink-project/src/";
-			String filePath =	"/Users/praghavan/test1/";
+			String filePath =	"/Users/paramraghavan/dev/test/temperature/";
             //Define the text input format based on the directory
             TextInputFormat auditFormat = new TextInputFormat(
                     new org.apache.flink.core.fs.Path(filePath));

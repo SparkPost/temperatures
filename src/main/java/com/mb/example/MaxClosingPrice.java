@@ -1,22 +1,45 @@
 package com.mb.example;
 
+import com.amazonaws.services.kinesisanalytics.runtime.KinesisAnalyticsRuntime;
 import com.mb.example.logic.MaxClosingPriceAggregatorProcess;
+import com.temperatures.StreamingJob;
 import org.apache.flink.api.common.functions.*;
 import org.apache.flink.api.java.io.TextInputFormat;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.utils.ParameterTool;
+import org.apache.flink.runtime.jobgraph.JobGraph;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.source.FileProcessingMode;
 
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Properties;
+
 public class MaxClosingPrice {
 
     public static void main(String[] args) throws Exception {
 
-        final StreamExecutionEnvironment env =
-                StreamExecutionEnvironment.getExecutionEnvironment();
+        //
+//        final StreamExecutionEnvironment env =
+//                StreamExecutionEnvironment.getExecutionEnvironment();
+        Map<String, Properties> applicationProperties = KinesisAnalyticsRuntime.getApplicationProperties();
+        ArrayList<Properties> groups = new ArrayList<Properties>(applicationProperties.values());
+        Properties props = new Properties();
+        org.apache.flink.configuration.Configuration conf = new org.apache.flink.configuration.Configuration();
+        conf.setInteger(org.apache.flink.configuration.RestOptions.PORT, 8085);
+        int defaultLocalParallelism = Runtime.getRuntime().availableProcessors();
+        conf.setString("taskmanager.memory.network.max", "1gb");
+        conf.setBoolean("queryable-state.enable", true);
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironment(defaultLocalParallelism, conf);
+
+        //
+
+
 
 //        DataStream<String> streamFilesAsString =
 //                env.readTextFile("src/main/resources/MSFT_2020.csv");
@@ -66,6 +89,9 @@ public class MaxClosingPrice {
         operator_MaxClosingPriceAgg.setParallelism(1);
         operator_MaxClosingPriceAgg.print();
         env.execute();
+
+        JobGraph jobGraph = env.getStreamGraph().getJobGraph();
+        System.out.println("[info] Job ID: " + jobGraph.getJobID());
     }
 
 }
