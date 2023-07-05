@@ -15,6 +15,12 @@ import java.util.concurrent.CompletableFuture;
 
 public class QueryStateClient {
 
+    /**
+     * Added following jvm args when executing QueryStateClient
+     * --add-opens java.base/jdk.internal.misc=ALL-UNNAMED -Dio.netty.tryReflectionSetAccessible=true
+     * @param args
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception {
         QueryableStateClient client = new QueryableStateClient("127.0.0.1", 9069);
 
