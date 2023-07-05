@@ -24,8 +24,8 @@ public class QueryStateClient {
                         "average",
                         TypeInformation.of(new TypeHint<Tuple2<Long, Long>>() {}));
         long key = 2l;
-        JobID jobId = new JobID();
-        // 019eb955388dccd60889ecc6db5b9a6d
+        //  http://localhost:8086/jobs
+        //  http://localhost:8086/jobs/overview
         CompletableFuture<ValueState<Tuple2<Long, Long>>> resultFuture =
                 client.getKvState(JobID.fromHexString("3a430f6aa092a3ca38b221502074aab3"), "query-name", key, BasicTypeInfo.LONG_TYPE_INFO, descriptor);
 //
